@@ -1,16 +1,16 @@
-import { parse } from "csv-parse/sync";
-import fs from "fs";
+import { parse } from 'csv-parse/sync';
+import fs from 'fs';
 import {
   fetchRepositoryIssues,
   fetchIssueComments,
   fetchIssueEvents,
-} from "./src/api.mjs";
-import { saveIssuesToFile } from "./src/issues.mjs";
-import { saveCommentsToFile } from "./src/comments.mjs";
-import { saveEventsToFile } from "./src/events.mjs";
+} from './src/api.mjs';
+import { saveIssuesToFile } from './src/issues.mjs';
+import { saveCommentsToFile } from './src/comments.mjs';
+import { saveEventsToFile } from './src/events.mjs';
 
-const OWNER = "microsoft";
-const REPO = "vscode";
+const OWNER = 'microsoft';
+const REPO = 'vscode';
 
 const issuesWithComments = [];
 
@@ -33,7 +33,7 @@ async function fetchAndSaveIssues(page) {
 
 async function main() {
   let hasMoreIssues = true;
-  let page = 1;
+  let page = Number(process.env.START_PAGE) || 1;
   let shouldSaveIssues = true;
 
   // if (fs.existsSync("./issues.csv")) {
@@ -79,7 +79,7 @@ async function main() {
 }
 
 function readIssues() {
-  const issues = parse(fs.readFileSync("./issues.csv"));
+  const issues = parse(fs.readFileSync('./issues.csv'));
   return issues.map((issue) => issue[2]);
 }
 
@@ -99,17 +99,19 @@ function readIssues() {
 
       if (Array.isArray(data)) {
         const filteredEvents = data.filter(
-          (event) => event.event === "cross-referenced"
+          (event) => event.event === 'cross-referenced'
         );
-        
-        console.log(`found ${filteredEvents.length} events out of ${data.length} events`)
+
+        console.log(
+          `found ${filteredEvents.length} events out of ${data.length} events`
+        );
         if (filteredEvents.length) {
           saveEventsToFile(filteredEvents);
         }
       }
     } catch (error) {
-      console.log(error)
-      console.log("script failed on index: ", index);
+      console.log(error);
+      console.log('script failed on index: ', index);
       break;
     }
   }

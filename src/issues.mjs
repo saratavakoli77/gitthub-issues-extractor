@@ -28,9 +28,16 @@ function initializeIssuesFile() {
   );
 }
 
-function saveIssuesToFile(issues) {
+function saveIssuesToFile(issues, page) {
   if (!fs.existsSync(FILE_PATH)) {
     initializeIssuesFile();
+  }
+
+  if (!Array.isArray(issues)) {
+    logger.warn(
+      `issues is not an array: ${JSON.stringify(issues)}, page: ${page}`
+    );
+    return;
   }
 
   const rows = issues.map((issue) => [
@@ -55,8 +62,12 @@ export async function fetchAndSaveIssues({ page }) {
     repository: process.env.GITHUB_REPO,
   });
 
+  if (issues && issues.message === 'Bad credentials') {
+    throw new Error('RATE LIMIT EXCEEDED');
+  }
+
   try {
-    await saveIssuesToFile(issues);
+    await saveIssuesToFile(issues, page);
   } catch (error) {
     logger.error(`error saving issues to file for page: ${page}`, error);
   }

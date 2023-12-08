@@ -51,7 +51,7 @@ export function fetchIssueEvents({
     {
       headers: {
         Accept: 'application/vnd.github+json',
-        Authorization: 'Bearer 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',
+        Authorization: `Bearer ${process.env.GITHUB_API_KEY}`,
         'X-GitHub-Api-Version': '2022-11-28',
       },
     }
